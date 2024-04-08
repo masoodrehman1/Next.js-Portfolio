@@ -4,20 +4,20 @@ import { NextResponse } from "next/server";
 
 export const dynomic = "force-dynomic";
 export async function GET(req) {
-  await connectToDB();
-  const extractData = await Education.find({});
   try {
+    await connectToDB();
+    const extractData = await Education.find({});
     if (extractData) {
-      NextResponse({ success: true, data: extractData });
+      return NextResponse.json({ success: true, data: extractData });
     } else {
-      NextResponse({
+      return NextResponse.json({
         success: false,
         message: "error occour while getting data",
       });
     }
   } catch (e) {
     console.log(e);
-    NextResponse({
+    return NextResponse.json({
       success: false,
       message: "error occour while getting data",
     });

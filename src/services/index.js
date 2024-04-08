@@ -1,4 +1,5 @@
 export async function addData(currentTab, formData) {
+  console.log(formData);
   try {
     const response = await fetch(`/api/${currentTab}/add`, {
       method: "POST",

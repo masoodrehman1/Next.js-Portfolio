@@ -32,6 +32,7 @@ export default function AdminProjectSection({
   setFormData,
   handleSaveData,
 }) {
+  console.log(formData);
   return (
     <div className="w-full">
       <div

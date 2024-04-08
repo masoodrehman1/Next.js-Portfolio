@@ -34,7 +34,7 @@ export default function AdminHomeSection({
         />
         <button
           onClick={() => handleSaveData("home")}
-          className="border border-green-700 p-4 font-bold text-[16px ]"
+          className="border border-green-700 p-4 font-bold text-[16px]"
         >
           Add info
         </button>

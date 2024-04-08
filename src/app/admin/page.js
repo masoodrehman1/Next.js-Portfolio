@@ -1,13 +1,12 @@
 "use client";
-
-import { useState } from "react";
 import AdminAboutSection from "@/component/adminSection/about";
 import AdminEducationSection from "@/component/adminSection/education";
 import AdminExperienceSection from "@/component/adminSection/experience";
 import FormControls from "@/component/adminSection/form-controls";
 import AdminHomeSection from "@/component/adminSection/home";
 import AdminProjectSection from "@/component/adminSection/projects";
-import { addData, updatedData } from "@/services";
+import { addData, getData, updatedData } from "@/services";
+import { useEffect, useState } from "react";
 
 const initialHomeData = {
   heading: "",
@@ -43,11 +42,12 @@ export default function AdminSection() {
   const [experienceSectionData, setExperienceSectionData] = useState(
     initialExperienceData
   );
-  const [update, setUpdate] = useState();
+  const [update, setUpdate] = useState(false);
   const [educationSectionData, setEducationSectionData] =
     useState(initialEducationData);
   const [projectSectionData, setProjectSectionData] =
     useState(initialProjectData);
+  const [allData, setAllData] = useState({});
 
   const menuItem = [
     {
@@ -106,20 +106,55 @@ export default function AdminSection() {
       ),
     },
   ];
+  async function extractAllData() {
+    const data = await getData(currentTab);
+
+    if (data?.success && data.data.length > 0) {
+      const homedata = data.data[0];
+      setAllData({
+        ...allData,
+        [currentTab]: homedata,
+      });
+      switch (currentTab) {
+        case "home":
+          setHomeSectionData(homedata);
+          break;
+        case "about":
+          setAboutSectionData(homedata);
+          break;
+        case "experience":
+          setExperienceSectionData(homedata);
+          break;
+        case "education":
+          setEducationSectionData(homedata);
+          break;
+        case "projects":
+          setProjectSectionData(homedata);
+          break;
+        default:
+          break;
+      }
+    }
+  }
   async function handleSaveData() {
     const dataMap = {
       home: homeSectionData,
       about: aboutSectionData,
       experience: experienceSectionData,
       education: educationSectionData,
-      project: projectSectionData,
+      projects: projectSectionData,
     };
+
     const response = await addData(currentTab, dataMap[currentTab]);
-    console.log(response, "response");
+
     if (response.success) {
       resetFormData();
+      extractAllData();
     }
   }
+  useEffect(() => {
+    extractAllData();
+  }, [currentTab]);
   function resetFormData() {
     setHomeSectionData(initialHomeData);
     setAboutSectionData(initialAboutData);
@@ -127,6 +162,7 @@ export default function AdminSection() {
     setExperienceSectionData(initialExperienceData);
     setProjectSectionData(initialProjectData);
   }
+
   return (
     <div className="border-b border-gray-200">
       <nav className="-mb-0.5 flex justify-center space-x-6" role="tabelist">

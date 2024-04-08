@@ -4,23 +4,23 @@ import { NextResponse } from "next/server";
 export const dynomic = "dynomic-force";
 
 export async function GET() {
-  await connectToDB();
-  const extractData = await About.find({});
   try {
+    await connectToDB();
+    const extractData = await About.find({});
     if (extractData) {
-      NextResponse({
+      return NextResponse.json({
         success: true,
         data: extractData,
       });
     } else {
-      NextResponse({
+      return NextResponse.json({
         success: false,
         message: "error occour while getting data",
       });
     }
   } catch (e) {
     console.log(e);
-    NextResponse({
+    return NextResponse.json({
       success: false,
       message: "error occour while getting data",
     });

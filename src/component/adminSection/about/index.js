@@ -23,13 +23,13 @@ const controls = [
   },
   {
     name: "noofclients",
-    placeholder: "No of clients",
+    placeholder: "No Of Clients",
     type: "text",
     label: "Enter no of clients",
   },
   {
     name: "skills",
-    placeholder: "skills",
+    placeholder: "Skills",
     type: "text",
     label: "Skills",
   },

@@ -3,24 +3,25 @@ import connectToDB from "@/database";
 import Project from "@/models/Project";
 export const dynomic = "force-dynomic";
 export async function POST(req) {
-  await connectToDB();
-  const extractData = req.json();
-  const saveData = Project.create(extractData);
   try {
+    await connectToDB();
+    const extractData = await req.json();
+    const saveData = await Project.create(extractData);
+    console.log(extractData);
     if (saveData) {
-      NextResponse.json({
-        success: false,
+      return NextResponse.json({
+        success: true,
         message: "data saved successfully",
       });
     } else {
-      NextResponse.json({
+      return NextResponse.json({
         success: false,
         message: "error occour while saving data",
       });
     }
   } catch (e) {
     console.log("error occour while saving data", e);
-    NextResponse.json({
+    return NextResponse.json({
       success: false,
       message: "error occour while saving data",
     });
