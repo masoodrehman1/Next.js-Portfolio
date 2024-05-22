@@ -1,11 +1,12 @@
 "use client";
-import AdminAboutSection from "@/component/adminSection/about";
-import AdminEducationSection from "@/component/adminSection/education";
-import AdminExperienceSection from "@/component/adminSection/experience";
-import FormControls from "@/component/adminSection/form-controls";
-import AdminHomeSection from "@/component/adminSection/home";
-import AdminProjectSection from "@/component/adminSection/projects";
-import { addData, getData, updatedData } from "@/services";
+import AdminAboutSection from "@/components/adminSection/about";
+import AdminEducationSection from "@/components/adminSection/education";
+import AdminExperienceSection from "@/components/adminSection/experience";
+import FormControls from "@/components/adminSection/form-controls";
+import AdminHomeSection from "@/components/adminSection/home";
+import Login from "@/components/adminSection/login";
+import AdminProjectSection from "@/components/adminSection/projects";
+import { addData, getData, login, updatedData } from "@/services";
 import { useEffect, useState } from "react";
 
 const initialHomeData = {
@@ -35,6 +36,10 @@ const initialProjectData = {
   website: "",
   github: "",
 };
+const loginInilials = {
+  username: "",
+  password: "",
+};
 export default function AdminSection() {
   const [currentTab, setCurrentTab] = useState("home");
   const [homeSectionData, setHomeSectionData] = useState(initialHomeData);
@@ -48,6 +53,8 @@ export default function AdminSection() {
   const [projectSectionData, setProjectSectionData] =
     useState(initialProjectData);
   const [allData, setAllData] = useState({});
+  const [authUser, setAuthUser] = useState(false);
+  const [userLoginData, setUserLoginData] = useState(loginInilials);
 
   const menuItem = [
     {
@@ -80,6 +87,7 @@ export default function AdminSection() {
           formData={experienceSectionData}
           setFormData={setExperienceSectionData}
           handleSaveData={handleSaveData}
+          data={allData?.experience}
         />
       ),
     },
@@ -91,6 +99,7 @@ export default function AdminSection() {
           formData={educationSectionData}
           setFormData={setEducationSectionData}
           handleSaveData={handleSaveData}
+          data={allData?.education}
         />
       ),
     },
@@ -102,40 +111,42 @@ export default function AdminSection() {
           formData={projectSectionData}
           setFormData={setProjectSectionData}
           handleSaveData={handleSaveData}
+          data={allData?.projects}
         />
       ),
     },
   ];
   async function extractAllData() {
-    const data = await getData(currentTab);
+    const response = await getData(currentTab);
 
-    if (data?.success && data.data.length > 0) {
-      const homedata = data.data[0];
+    if (
+      currentTab === "home" &&
+      response &&
+      response.data &&
+      response.data.length
+    ) {
+      setHomeSectionData(response && response.data[0]);
+      setUpdate(true);
+    }
+
+    if (
+      currentTab === "about" &&
+      response &&
+      response.data &&
+      response.data.length
+    ) {
+      setAboutSectionData(response && response.data[0]);
+      setUpdate(true);
+    }
+
+    if (response?.success) {
       setAllData({
         ...allData,
-        [currentTab]: homedata,
+        [currentTab]: response && response.data,
       });
-      switch (currentTab) {
-        case "home":
-          setHomeSectionData(homedata);
-          break;
-        case "about":
-          setAboutSectionData(homedata);
-          break;
-        case "experience":
-          setExperienceSectionData(homedata);
-          break;
-        case "education":
-          setEducationSectionData(homedata);
-          break;
-        case "projects":
-          setProjectSectionData(homedata);
-          break;
-        default:
-          break;
-      }
     }
   }
+
   async function handleSaveData() {
     const dataMap = {
       home: homeSectionData,
@@ -145,7 +156,9 @@ export default function AdminSection() {
       projects: projectSectionData,
     };
 
-    const response = await addData(currentTab, dataMap[currentTab]);
+    const response = update
+      ? await updatedData(currentTab, dataMap[currentTab])
+      : await addData(currentTab, dataMap[currentTab]);
 
     if (response.success) {
       resetFormData();
@@ -162,6 +175,26 @@ export default function AdminSection() {
     setExperienceSectionData(initialExperienceData);
     setProjectSectionData(initialProjectData);
   }
+  useEffect(
+    () => setAuthUser(JSON.parse(sessionStorage.getItem("authUser"))),
+    []
+  );
+  async function handleLogin() {
+    const res = await login(userLoginData);
+    console.log(res, "login");
+    if (res?.success) {
+      setAuthUser(true);
+      sessionStorage.setItem("authUser", JSON.stringify(true));
+    }
+  }
+  if (!authUser)
+    return (
+      <Login
+        formData={userLoginData}
+        handleLogin={handleLogin}
+        setFormData={setUserLoginData}
+      />
+    );
 
   return (
     <div className="border-b border-gray-200">
@@ -174,11 +207,20 @@ export default function AdminSection() {
             onClick={() => {
               setCurrentTab(items.id);
               resetFormData();
+              setUpdate(false);
             }}
           >
             {items.label}
           </button>
         ))}
+        <button
+          className="p-4 font-bold text-black text-xl"
+          onClick={() => {
+            setAuthUser(false), sessionStorage.removeItem("authUser");
+          }}
+        >
+          Log Out
+        </button>
       </nav>
       <div className="mt-10 p-10">
         {menuItem.map((items) => items.id === currentTab && items.component)}

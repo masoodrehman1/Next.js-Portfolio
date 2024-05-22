@@ -38,6 +38,7 @@ export default function AdminExperienceSection({
   formData,
   setFormData,
   handleSaveData,
+  data,
 }) {
   return (
     <div className="w-full">
@@ -45,6 +46,23 @@ export default function AdminExperienceSection({
         className="bg-[#ffffff] shadow-md rounded px-8 pt-6
 pb-8 mb-4"
       >
+        <div className="mb-10">
+          {data && data.length ? (
+            data.map((item) => {
+              return (
+                <div className="flex flex-col gap-4 border p-4 border-green-600">
+                  <p>{item.position}</p>
+                  <p>{item.company}</p>
+                  <p>{item.duration}</p>
+                  <p>{item.location}</p>
+                  <p>{item.jobprofile}</p>
+                </div>
+              );
+            })
+          ) : (
+            <p>data missing </p>
+          )}
+        </div>
         <FormControls
           controls={controls}
           formData={formData}

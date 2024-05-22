@@ -31,14 +31,27 @@ export default function AdminProjectSection({
   formData,
   setFormData,
   handleSaveData,
+  data,
 }) {
-  console.log(formData);
   return (
     <div className="w-full">
       <div
         className="bg-[#ffffff] shadow-md rounded px-8 pt-6
 pb-8 mb-4"
       >
+        <div className="mb-10">
+          {data && data.length
+            ? data.map((item) => (
+                <div className="border p-4 border-green-600 flex flex-col gap-4">
+                  <p>{item.name}</p>
+                  <p>{item.technologies}</p>
+                  <p>{item.website}</p>
+                  <p>{item.github}</p>
+                </div>
+              ))
+            : null}
+        </div>
+
         <FormControls
           controls={controls}
           formData={formData}

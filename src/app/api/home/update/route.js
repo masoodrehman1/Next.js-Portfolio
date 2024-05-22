@@ -21,19 +21,19 @@ export async function PUT(req) {
       }
     );
     if (updateData) {
-      NextResponse.json({
+      return NextResponse.json({
         success: true,
         message: "Home data has been updated successfuly",
       });
     } else {
-      NextResponse.json({
+      return NextResponse.json({
         success: false,
         message: "error occour while updating Home data",
       });
     }
   } catch (e) {
     console.log(e);
-    NextResponse.json({
+    return NextResponse.json({
       success: false,
       message: "error occour while updating data ",
     });
